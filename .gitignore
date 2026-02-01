@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+.DS_Store
+dist/
+dist-ssr/
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
