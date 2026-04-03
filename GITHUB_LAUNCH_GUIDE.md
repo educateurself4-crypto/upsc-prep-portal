@@ -24,7 +24,7 @@ git add .
 git commit -m "Deployment: Pro UPSC Portal"
 
 # 4. Connect to your GitHub (Replace YOUR_USERNAME with your real GitHub name)
-git remote add origin https://github.com/YOUR_USERNAME/upsc-prep-portal.git
+git remote add origin https://github.com/educateurself4-crypto/upsc-prep-portal.git
 
 # 5. Send your code to GitHub
 git push -u origin main
@@ -42,7 +42,7 @@ npm run deploy
 2. Click **Settings** (top tab) -> **Pages** (left sidebar).
 3. Under **Build and deployment > Branch**, ensure it is set to `gh-pages` and folder `/ (root)`.
 4. Wait 1-2 minutes. GitHub will provide a link like:
-   `https://YOUR_USERNAME.github.io/upsc-prep-portal/`
+   `https://educateurself4-crypto.github.io/upsc-prep-portal/`
 
 ---
 

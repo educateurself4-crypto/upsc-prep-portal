@@ -40,7 +40,7 @@ const Infographics = () => {
             </div>
 
             <div className="info-cta glass-card">
-                <p>New Mind Maps added every week via n8n integration.</p>
+                <p>New Mind Maps added every week via our automated cloud dashboard.</p>
             </div>
         </div>
     )
