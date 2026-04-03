@@ -1,0 +1,27 @@
+{
+  "ca_quizzes": [
+    {
+      "title": "Daily CA Quiz",
+      "date": "2026-04-03",
+      "questions": [
+        {
+          "q": "What is the capital of India?",
+          "options": ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
+          "correct": 1,
+          "explanation": "New Delhi is the capital of India."
+        }
+      ]
+    }
+  ],
+  "static_quizzes": [],
+  "notes": [
+    {
+      "title": "Economy Updates",
+      "category": "Economy",
+      "summary": "Recent changes in RBI monetary policy.",
+      "date": "03 April 2026",
+      "type": "daily"
+    }
+  ],
+  "static_notes": []
+}
