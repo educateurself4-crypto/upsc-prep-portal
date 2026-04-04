@@ -15,6 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.29.2",
     "lucide-react": "^0.563.0",
     "papaparse": "^5.5.3",
