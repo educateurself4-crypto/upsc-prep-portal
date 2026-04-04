@@ -50,7 +50,7 @@ const DailyNotes = () => {
 
                 // 2. Fetch from Vercel/MongoDB Backend
                 if (combinedNotes.length === 0) {
-                    const data = await fetchWithCache('backend_daily_notes', MONGODB_BACKEND_URL);
+                    const data = await fetchWithCache('backend_daily_notes_v2', MONGODB_BACKEND_URL);
                     
                     if (data) {
                         combinedNotes = data.notes || [];

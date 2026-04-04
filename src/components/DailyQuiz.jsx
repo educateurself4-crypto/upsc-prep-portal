@@ -97,7 +97,7 @@ const DailyQuiz = () => {
 
                 // 2. Fetch from Vercel/MongoDB Backend
                 if (combinedCA.length === 0 && combinedStatic.length === 0) {
-                    const data = await fetchWithCache('backend_daily_quiz', MONGODB_BACKEND_URL);
+                    const data = await fetchWithCache('backend_daily_quiz_v2', MONGODB_BACKEND_URL);
                     if (data) {
                         if (data.ca_quizzes) combinedCA = data.ca_quizzes.map(formatQuiz);
                         if (data.static_quizzes) combinedStatic = data.static_quizzes.map(formatQuiz);
