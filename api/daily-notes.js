@@ -35,7 +35,9 @@ export default async function handler(req, res) {
 
         // 1. Check if we already have today's notes in DB
         const existingData = await collection.findOne({ fetchDate: today });
-        if (existingData) {
+        const hasNotes = existingData && existingData.data && ((existingData.data.notes && existingData.data.notes.length > 0) || (Array.isArray(existingData.data) && existingData.data.length > 0));
+        
+        if (hasNotes) {
             console.log("Serving daily notes from MongoDB Cache");
             return res.status(200).json(existingData.data);
         }
@@ -55,13 +57,18 @@ export default async function handler(req, res) {
         }
 
         const data = await response.json();
+        
+        const isDataEmpty = !data || (data.notes && data.notes.length === 0) || (Array.isArray(data) && data.length === 0);
+        if (isDataEmpty) {
+             return res.status(500).json({ error: 'N8n returned empty notes data' });
+        }
 
         // 3. Save to MongoDB
-        await collection.insertOne({
-            fetchDate: today,
-            data: data,
-            createdAt: new Date()
-        });
+        await collection.updateOne(
+            { fetchDate: today },
+            { $set: { data: data, createdAt: new Date() } },
+            { upsert: true }
+        );
         
         console.log("Stored new daily notes to MongoDB successfully");
         return res.status(200).json(data);

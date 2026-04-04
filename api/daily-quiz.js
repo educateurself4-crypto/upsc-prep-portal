@@ -32,9 +32,9 @@ export default async function handler(req, res) {
 
         const today = new Date().toDateString();
 
-        // 1. Check if we already have today's quiz in DB
+        // 1. Check if we already have today's quiz in DB (and ensure it's not empty)
         const existingData = await collection.findOne({ fetchDate: today });
-        if (existingData) {
+        if (existingData && (existingData.data.ca_quizzes?.length > 0 || existingData.data.static_quizzes?.length > 0)) {
             console.log("Serving daily quiz from MongoDB Cache");
             return res.status(200).json(existingData.data);
         }
@@ -73,12 +73,16 @@ export default async function handler(req, res) {
             combinedData.static_quizzes = [...combinedData.static_quizzes, ...raw];
         }
 
+        if (combinedData.ca_quizzes.length === 0 && combinedData.static_quizzes.length === 0) {
+            return res.status(500).json({ error: 'Failed to fetch any quiz data from n8n' });
+        }
+
         // 3. Save to MongoDB
-        await collection.insertOne({
-            fetchDate: today,
-            data: combinedData,
-            createdAt: new Date()
-        });
+        await collection.updateOne(
+            { fetchDate: today },
+            { $set: { data: combinedData, createdAt: new Date() } },
+            { upsert: true }
+        );
 
         console.log("Stored new daily quiz to MongoDB successfully");
         return res.status(200).json(combinedData);
