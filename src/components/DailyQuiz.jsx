@@ -7,8 +7,7 @@ import { fetchWithCache } from '../utils/cacheManager'
 
 // --- CONTENT SOURCES ---
 const GSHEET_QUIZ_CSV_URL = ''; // Add your "Published as CSV" Google Sheet URL here
-const N8N_MOCK_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
-const N8N_STATIC_QUIZ_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-static-quiz';
+const MONGODB_BACKEND_URL = '/api/daily-quiz';
 const STATIC_ARCHIVE_URL = import.meta.env.BASE_URL + 'data/upsc_content.json';
 
 const DailyQuiz = () => {
@@ -96,21 +95,12 @@ const DailyQuiz = () => {
                     }
                 }
 
-                // 2. Fetch from n8n (with caching)
+                // 2. Fetch from Vercel/MongoDB Backend
                 if (combinedCA.length === 0 && combinedStatic.length === 0) {
-                    const dailyData = await fetchWithCache('n8n_daily_quiz_cache', N8N_MOCK_WEBHOOK_URL);
-                    if (dailyData) {
-                        const rawCA = dailyData.ca_quizzes || (Array.isArray(dailyData) ? [{ title: 'Daily Quiz', questions: dailyData }] : []);
-                        combinedCA = rawCA.map(formatQuiz);
-                        if (dailyData.static_quizzes) {
-                            combinedStatic = [...combinedStatic, ...dailyData.static_quizzes.map(formatQuiz)];
-                        }
-                    }
-
-                    const staticData = await fetchWithCache('n8n_static_quiz_cache', N8N_STATIC_QUIZ_WEBHOOK_URL);
-                    if (staticData) {
-                        let raw = Array.isArray(staticData) ? [{ title: 'Static Practice Quiz', questions: staticData }] : (staticData.static_quizzes || (staticData.questions ? [staticData] : []));
-                        combinedStatic = [...combinedStatic, ...raw.map(formatQuiz)];
+                    const data = await fetchWithCache('backend_daily_quiz', MONGODB_BACKEND_URL);
+                    if (data) {
+                        if (data.ca_quizzes) combinedCA = data.ca_quizzes.map(formatQuiz);
+                        if (data.static_quizzes) combinedStatic = data.static_quizzes.map(formatQuiz);
                     }
 
                     // 3. Fallback to Local Archive if absolutely nothing works

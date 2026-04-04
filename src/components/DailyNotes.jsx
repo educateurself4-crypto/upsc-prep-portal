@@ -7,7 +7,7 @@ import { fetchWithCache } from '../utils/cacheManager'
 
 // --- CONTENT SOURCES ---
 const GSHEET_NOTES_CSV_URL = ''; // Add your "Published as CSV" Google Sheet URL here
-const N8N_CA_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
+const MONGODB_BACKEND_URL = '/api/daily-notes';
 const STATIC_ARCHIVE_URL = import.meta.env.BASE_URL + 'data/upsc_content.json';
 
 const DailyNotes = () => {
@@ -48,9 +48,9 @@ const DailyNotes = () => {
                     }
                 }
 
-                // 2. Fetch from n8n (with caching)
+                // 2. Fetch from Vercel/MongoDB Backend
                 if (combinedNotes.length === 0) {
-                    const data = await fetchWithCache('n8n_daily_notes_cache', N8N_CA_WEBHOOK_URL);
+                    const data = await fetchWithCache('backend_daily_notes', MONGODB_BACKEND_URL);
                     
                     if (data) {
                         combinedNotes = data.notes || [];
