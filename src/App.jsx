@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Analytics } from '@vercel/analytics/react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Syllabus from './components/Syllabus'
@@ -69,6 +70,7 @@ function App() {
                     <VisitorCounter />
                 </div>
             </footer>
+            <Analytics />
         </div>
     )
 }
