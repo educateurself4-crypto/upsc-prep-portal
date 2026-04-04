@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, Search, ChevronRight, HelpCircle, Loader2, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { fetchWithCache } from '../utils/cacheManager'
 
 // --- CONTENT SOURCES ---
 const GSHEET_NOTES_CSV_URL = ''; // Add your "Published as CSV" Google Sheet URL here
@@ -47,17 +48,27 @@ const DailyNotes = () => {
                     }
                 }
 
-                // 2. Fallback to Local Archive or n8n
+                // 2. Fetch from n8n (with caching)
                 if (combinedNotes.length === 0) {
-                    let response = await fetch(STATIC_ARCHIVE_URL);
-                    if (!response.ok) {
-                        response = await fetch(N8N_CA_WEBHOOK_URL);
-                    }
-
-                    if (response.ok) {
-                        const data = await response.json();
+                    const data = await fetchWithCache('n8n_daily_notes_cache', N8N_CA_WEBHOOK_URL);
+                    
+                    if (data) {
                         combinedNotes = data.notes || [];
                         combinedStatic = data.static_notes || [];
+                    }
+
+                    // 3. Fallback to Local Archive if n8n fails
+                    if (combinedNotes.length === 0) {
+                        try {
+                            const response = await fetch(STATIC_ARCHIVE_URL);
+                            if (response.ok) {
+                                const staticData = await response.json();
+                                combinedNotes = staticData.notes || [];
+                                combinedStatic = staticData.static_notes || [];
+                            }
+                        } catch (e) {
+                            console.log("No static archive found.")
+                        }
                     }
                 }
 

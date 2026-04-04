@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Timer, Award, RefreshCw, Loader2, AlertCircle, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { fetchWithCache } from '../utils/cacheManager'
 
 // --- CONTENT SOURCES ---
 const GSHEET_QUIZ_CSV_URL = ''; // Add your "Published as CSV" Google Sheet URL here
@@ -95,38 +96,34 @@ const DailyQuiz = () => {
                     }
                 }
 
-                // 2. Fallback to Local Archive or n8n
+                // 2. Fetch from n8n (with caching)
                 if (combinedCA.length === 0 && combinedStatic.length === 0) {
-                    // Try static local storage first
-                    try {
-                        const staticRes = await fetch(STATIC_ARCHIVE_URL);
-                        if (staticRes.ok) {
-                            const data = await staticRes.json();
-                            const rawCA = data.ca_quizzes || (Array.isArray(data) ? [{ title: 'Daily Quiz', questions: data }] : []);
-                            combinedCA = rawCA.map(formatQuiz);
-                            combinedStatic = (data.static_quizzes || []).map(formatQuiz);
+                    const dailyData = await fetchWithCache('n8n_daily_quiz_cache', N8N_MOCK_WEBHOOK_URL);
+                    if (dailyData) {
+                        const rawCA = dailyData.ca_quizzes || (Array.isArray(dailyData) ? [{ title: 'Daily Quiz', questions: dailyData }] : []);
+                        combinedCA = rawCA.map(formatQuiz);
+                        if (dailyData.static_quizzes) {
+                            combinedStatic = [...combinedStatic, ...dailyData.static_quizzes.map(formatQuiz)];
                         }
-                    } catch (e) { console.log("No static archive found yet."); }
+                    }
 
-                    // If still empty, try LIVE n8n
-                    if (combinedCA.length === 0) {
-                        const [dailyRes, dedicatedStaticRes] = await Promise.all([
-                            fetch(N8N_MOCK_WEBHOOK_URL).catch(() => null),
-                            fetch(N8N_STATIC_QUIZ_WEBHOOK_URL).catch(() => null)
-                        ]);
+                    const staticData = await fetchWithCache('n8n_static_quiz_cache', N8N_STATIC_QUIZ_WEBHOOK_URL);
+                    if (staticData) {
+                        let raw = Array.isArray(staticData) ? [{ title: 'Static Practice Quiz', questions: staticData }] : (staticData.static_quizzes || (staticData.questions ? [staticData] : []));
+                        combinedStatic = [...combinedStatic, ...raw.map(formatQuiz)];
+                    }
 
-                        if (dailyRes && dailyRes.ok) {
-                            const data = await dailyRes.json();
-                            const rawCA = data.ca_quizzes || (Array.isArray(data) ? [{ title: 'Daily Quiz', questions: data }] : []);
-                            combinedCA = rawCA.map(formatQuiz);
-                            if (data.static_quizzes) combinedStatic = [...combinedStatic, ...data.static_quizzes.map(formatQuiz)];
-                        }
-
-                        if (dedicatedStaticRes && dedicatedStaticRes.ok) {
-                            const staticData = await dedicatedStaticRes.json();
-                            let raw = Array.isArray(staticData) ? [{ title: 'Static Practice Quiz', questions: staticData }] : (staticData.static_quizzes || (staticData.questions ? [staticData] : []));
-                            combinedStatic = [...combinedStatic, ...raw.map(formatQuiz)];
-                        }
+                    // 3. Fallback to Local Archive if absolutely nothing works
+                    if (combinedCA.length === 0 && combinedStatic.length === 0) {
+                        try {
+                            const staticRes = await fetch(STATIC_ARCHIVE_URL);
+                            if (staticRes.ok) {
+                                const data = await staticRes.json();
+                                const rawCA = data.ca_quizzes || (Array.isArray(data) ? [{ title: 'Daily Quiz', questions: data }] : []);
+                                combinedCA = rawCA.map(formatQuiz);
+                                combinedStatic = [...combinedStatic, ...(data.static_quizzes || []).map(formatQuiz)];
+                            }
+                        } catch (e) { console.log("No static archive found either."); }
                     }
                 }
 
