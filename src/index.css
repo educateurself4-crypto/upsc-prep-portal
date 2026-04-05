@@ -1516,7 +1516,7 @@ footer {
 /* Page Header Banner */
 .page-header-banner {
     background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8));
-    padding: 6rem 2rem 4rem;
+    padding: 4rem 2rem 2rem;
     margin-bottom: 0px;
     border-bottom: 1px solid var(--glass-border);
     display: flex;
@@ -1540,7 +1540,7 @@ footer {
 }
 
 .page-header-banner h1 {
-    font-size: 3rem;
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     color: var(--text-main);

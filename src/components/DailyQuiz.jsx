@@ -57,7 +57,7 @@ const DailyQuiz = () => {
 
                 const formatQuiz = (q) => ({
                     ...q,
-                    date: q.date || 'Archives',
+                    date: q.date || new Date().toISOString().split('T')[0],
                     questions: (q.questions || []).map(normalizeQuestion)
                 });
 
@@ -78,7 +78,7 @@ const DailyQuiz = () => {
                             if (!quizGroups[title]) {
                                 quizGroups[title] = {
                                     title: title,
-                                    date: row.Date || 'Archives',
+                                    date: row.Date || new Date().toISOString().split('T')[0],
                                     category: row.Category || 'General',
                                     type: (row.Type || 'daily').toLowerCase(),
                                     questions: []
