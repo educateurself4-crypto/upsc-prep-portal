@@ -83,10 +83,18 @@ export default async function handler(req, res) {
         let allStaticNotes = [];
         
         for (const doc of historicalDocs) {
+            const docDate = doc.fetchDate ? new Date(doc.fetchDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
             const data = doc.data;
-            if (data?.notes) allNotes.push(...data.notes);
-            else if (Array.isArray(data)) allNotes.push(...data); // flat array
-            if (data?.static_notes) allStaticNotes.push(...data.static_notes);
+            
+            if (data?.notes) {
+                data.notes.forEach(note => allNotes.push({ ...note, date: docDate, Date: undefined }));
+            } else if (Array.isArray(data)) {
+                data.forEach(note => allNotes.push({ ...note, date: docDate, Date: undefined }));
+            }
+            
+            if (data?.static_notes) {
+                data.static_notes.forEach(note => allStaticNotes.push({ ...note, date: docDate, Date: undefined }));
+            }
         }
 
         return res.status(200).json({ notes: allNotes, static_notes: allStaticNotes });

@@ -94,19 +94,19 @@ export default async function handler(req, res) {
         let allStatic = [];
         
         for (const doc of historicalDocs) {
-            const docDate = doc.fetchDate ? new Date(doc.fetchDate).toISOString().split('T')[0] : '';
+            const docDate = doc.fetchDate ? new Date(doc.fetchDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
             
             const docCA = doc.data?.ca_quizzes || [];
             docCA.forEach(q => {
-                const standardizedQ = { ...q };
-                if (!standardizedQ.Date && !standardizedQ.date && docDate) standardizedQ.date = docDate;
+                const standardizedQ = { ...q, date: docDate };
+                delete standardizedQ.Date;
                 allCA.push(standardizedQ);
             });
 
             const docStatic = doc.data?.static_quizzes || [];
             docStatic.forEach(q => {
-                const standardizedQ = { ...q };
-                if (!standardizedQ.Date && !standardizedQ.date && docDate) standardizedQ.date = docDate;
+                const standardizedQ = { ...q, date: docDate };
+                delete standardizedQ.Date;
                 allStatic.push(standardizedQ);
             });
         }
