@@ -41,9 +41,18 @@ const DailyQuiz = () => {
             else correct = parseInt(rawCorrect) || 0;
         }
 
+        const optionsHindi = [
+            item['H option A'] || item['H Option A'] || item.hOption1 || '',
+            item['H option B'] || item['H Option B'] || item.hOption2 || '',
+            item['H option C'] || item['H Option C'] || item.hOption3 || '',
+            item['H option D'] || item['H Option D'] || item.hOption4 || ''
+        ];
+
         return {
             q: item.q || item.Question || item.question || 'Untitled Question',
+            qHindi: item.Hindi || item.hindi || '',
             options: options.length >= 2 ? options : ['Err: Missing Options'],
+            optionsHindi: optionsHindi.some(Boolean) ? optionsHindi : [],
             correct: correct,
             explanation: item.explanation || item.Explanation || 'No explanation provided.'
         };
@@ -257,19 +266,37 @@ const DailyQuiz = () => {
                         <span>{selectedQuiz.title}</span>
                         <span>Q {currentQ + 1}/{selectedQuiz.questions.length}</span>
                     </div>
-                    <h3>{selectedQuiz.questions[currentQ].q}</h3>
+                    <h3 style={{ lineHeight: '1.5' }}>
+                        <div>{selectedQuiz.questions[currentQ].q}</div>
+                        {selectedQuiz.questions[currentQ].qHindi && (
+                            <div className="hindi-text" style={{ fontSize: '0.95em', color: 'var(--text-muted)', marginTop: '0.6rem', fontWeight: 'normal', fontFamily: 'system-ui' }}>
+                                {selectedQuiz.questions[currentQ].qHindi}
+                            </div>
+                        )}
+                    </h3>
                     <div className="options-grid">
-                        {selectedQuiz.questions[currentQ].options.map((opt, idx) => (
-                            <button
-                                key={idx}
-                                className={`option-btn ${showExplanation ? (idx === selectedQuiz.questions[currentQ].correct ? 'correct' : 'wrong') : ''}`}
-                                onClick={() => !showExplanation && handleAnswer(idx)}
-                                disabled={showExplanation}
-                            >
-                                <span className="opt-label">{String.fromCharCode(65 + idx)}.</span>
-                                <span className="opt-text">{opt}</span>
-                            </button>
-                        ))}
+                        {selectedQuiz.questions[currentQ].options.map((opt, idx) => {
+                            const optHindi = selectedQuiz.questions[currentQ].optionsHindi?.[idx];
+                            return (
+                                <button
+                                    key={idx}
+                                    className={`option-btn ${showExplanation ? (idx === selectedQuiz.questions[currentQ].correct ? 'correct' : 'wrong') : ''}`}
+                                    onClick={() => !showExplanation && handleAnswer(idx)}
+                                    disabled={showExplanation}
+                                    style={{ alignItems: 'flex-start' }}
+                                >
+                                    <span className="opt-label" style={{ marginTop: '2px' }}>{String.fromCharCode(65 + idx)}.</span>
+                                    <div className="opt-text" style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', flex: 1 }}>
+                                        <span>{opt}</span>
+                                        {optHindi && (
+                                            <span style={{ fontSize: '0.9em', color: 'var(--text-muted)', marginTop: '0.3rem', fontFamily: 'system-ui' }}>
+                                                {optHindi}
+                                            </span>
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
                     {showExplanation && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="explanation-box">
