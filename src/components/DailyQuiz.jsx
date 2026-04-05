@@ -99,8 +99,13 @@ const DailyQuiz = () => {
                 if (combinedCA.length === 0 && combinedStatic.length === 0) {
                     const data = await fetchWithCache('backend_daily_quiz_v2', MONGODB_BACKEND_URL);
                     if (data) {
-                        if (data.ca_quizzes) combinedCA = data.ca_quizzes.map(formatQuiz);
-                        if (data.static_quizzes) combinedStatic = data.static_quizzes.map(formatQuiz);
+                        let rawCA = data.ca_quizzes || [];
+                        if (rawCA.length > 0 && !rawCA[0].questions) rawCA = [{ title: 'Daily CA Quiz', questions: rawCA }];
+                        combinedCA = rawCA.map(formatQuiz);
+
+                        let rawStatic = data.static_quizzes || [];
+                        if (rawStatic.length > 0 && !rawStatic[0].questions) rawStatic = [{ title: 'Static Practice Quiz', questions: rawStatic }];
+                        combinedStatic = rawStatic.map(formatQuiz);
                     }
 
                     // 3. Fallback to Local Archive if absolutely nothing works
