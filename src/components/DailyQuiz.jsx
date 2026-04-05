@@ -219,14 +219,14 @@ const DailyQuiz = () => {
                 </div>
             )}
 
-            <div className="mocktest-container">
-                {!testStarted && (
+            {!testStarted && (
+                <div className="mocktest-container" style={{ paddingBottom: '0' }}>
                     <div className="tabs" style={{ marginBottom: '2rem' }}>
                         <button className={`tab-btn ${activeSubTab === 'ca' ? 'active' : ''}`} onClick={() => setActiveSubTab('ca')}>Current Affairs Quizzes</button>
                         <button className={`tab-btn ${activeSubTab === 'static' ? 'active' : ''}`} onClick={() => setActiveSubTab('static')}>Static Quizzes</button>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             {!testStarted ? (
                 <div className="quiz-library-grid">
@@ -255,13 +255,13 @@ const DailyQuiz = () => {
                     )}
                 </div>
             ) : finished ? (
-                <div className="test-result glass-card">
+                <div className="test-result glass-card" style={{ maxWidth: '800px', margin: '2rem auto' }}>
                     <h2>Score: {score}/{selectedQuiz.questions.length}</h2>
                     <p>{Math.round((score / selectedQuiz.questions.length) * 100)}% Proficiency</p>
                     <button className="btn btn-secondary" onClick={() => { setTestStarted(false); setFinished(false); }}><RefreshCw size={18} /> Back to Library</button>
                 </div>
             ) : selectedQuiz ? (
-                <motion.div className="quiz-card glass-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.div className="quiz-card glass-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ maxWidth: '800px', margin: '1rem auto' }}>
                     <div className="quiz-meta">
                         <span>{selectedQuiz.title}</span>
                         <span>Q {currentQ + 1}/{selectedQuiz.questions.length}</span>
