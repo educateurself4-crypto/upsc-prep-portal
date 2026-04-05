@@ -100,11 +100,35 @@ const DailyQuiz = () => {
                     const data = await fetchWithCache('backend_daily_quiz_v2', MONGODB_BACKEND_URL);
                     if (data) {
                         let rawCA = data.ca_quizzes || [];
-                        if (rawCA.length > 0 && !rawCA[0].questions) rawCA = [{ title: 'Daily CA Quiz', questions: rawCA }];
+                        if (rawCA.length > 0 && !rawCA[0].questions) {
+                            const groupedByDate = {};
+                            rawCA.forEach(q => {
+                                const qDate = (q.Date || q.date || new Date().toISOString()).split('T')[0];
+                                if (!groupedByDate[qDate]) groupedByDate[qDate] = [];
+                                groupedByDate[qDate].push(q);
+                            });
+                            rawCA = Object.keys(groupedByDate).sort((a,b) => b.localeCompare(a)).map(d => ({
+                                title: 'Daily CA Quiz',
+                                date: d,
+                                questions: groupedByDate[d]
+                            }));
+                        }
                         combinedCA = rawCA.map(formatQuiz);
 
                         let rawStatic = data.static_quizzes || [];
-                        if (rawStatic.length > 0 && !rawStatic[0].questions) rawStatic = [{ title: 'Static Practice Quiz', questions: rawStatic }];
+                        if (rawStatic.length > 0 && !rawStatic[0].questions) {
+                            const groupedByDate = {};
+                            rawStatic.forEach(q => {
+                                const qDate = (q.Date || q.date || new Date().toISOString()).split('T')[0];
+                                if (!groupedByDate[qDate]) groupedByDate[qDate] = [];
+                                groupedByDate[qDate].push(q);
+                            });
+                            rawStatic = Object.keys(groupedByDate).sort((a,b) => b.localeCompare(a)).map(d => ({
+                                title: 'Static Practice Quiz',
+                                date: d,
+                                questions: groupedByDate[d]
+                            }));
+                        }
                         combinedStatic = rawStatic.map(formatQuiz);
                     }
 
