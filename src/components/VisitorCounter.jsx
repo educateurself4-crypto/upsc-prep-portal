@@ -5,8 +5,8 @@ const VisitorCounter = () => {
     const [count, setCount] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
 
-    // Using a public counter API for real persistence
-    const API_URL = 'https://api.counterapi.dev/v1/educateurself/homepage';
+    // Using our Native MongoDB Vercel Backend
+    const API_URL = '/api/counter';
 
     useEffect(() => {
         const updateCounter = async () => {
@@ -17,7 +17,7 @@ const VisitorCounter = () => {
                 let data;
                 if (!hasCounted) {
                     // 2. If new session, increment the global counter
-                    const response = await fetch(`${API_URL}/up`);
+                    const response = await fetch(`${API_URL}?action=up`);
                     data = await response.json();
                     sessionStorage.setItem('hasCounted', 'true');
                 } else {
