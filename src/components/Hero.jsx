@@ -41,6 +41,38 @@ const Hero = () => {
                     The premium ecosystem for India's toughest exam. Structured content, active tracking, and AI-driven growth.
                 </p>
 
+                {/* Prominent Daily Quiz Tab */}
+                <motion.button
+                    className="daily-quiz-highlight glass-card"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                    onClick={() => navigate('/daily-quiz')}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    style={{ 
+                        cursor: 'pointer', 
+                        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(251, 191, 36, 0.1))', 
+                        border: '1px solid var(--accent-color)', 
+                        width: '100%', 
+                        maxWidth: '600px', 
+                        marginBottom: '2rem', 
+                        padding: '1.2rem 1.5rem', 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        color: 'inherit'
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <Target size={28} className="accent-text" />
+                        <div style={{ textAlign: 'left' }}>
+                            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#f8fafc', textTransform: 'none', letterSpacing: 'normal' }}>Take Today's Daily Quiz</h3>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Current Affairs & Static MCQ</p>
+                        </div>
+                    </div>
+                    <ChevronRight size={20} className="accent-text" />
+                </motion.button>
+
                 <motion.div
                     className="daily-quote glass-card"
                     initial={{ opacity: 0 }}
