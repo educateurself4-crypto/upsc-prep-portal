@@ -33,45 +33,63 @@ export default async function handler(req, res) {
 
         const today = new Date().toDateString();
 
+        let todayData = null;
+
         // 1. Check if we already have today's notes in DB
         const existingData = await collection.findOne({ fetchDate: today });
         const hasNotes = existingData && existingData.data && ((existingData.data.notes && existingData.data.notes.length > 0) || (Array.isArray(existingData.data) && existingData.data.length > 0));
         
         if (hasNotes) {
-            console.log("Serving daily notes from MongoDB Cache");
-            return res.status(200).json(existingData.data);
+            console.log("Found today's notes in MongoDB Cache");
+            todayData = existingData.data;
         }
 
-        // 2. Not found in DB, fetch from n8n
-        console.log("Fetching new daily notes from n8n...");
-        const N8N_CA_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
+        // 2. Not found in DB, fetch from n8n webhook
+        if (!todayData) {
+            console.log("No valid notes cache for today, fetching fresh from n8n...");
+            const N8N_NOTES_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+            const response = await fetch(N8N_NOTES_WEBHOOK_URL, {
+                signal: controller.signal
+            }).catch(() => null);
+            clearTimeout(timeoutId);
+
+            if (!response || !response.ok) {
+                return res.status(response?.status || 500).json({ error: 'Failed to fetch notes from n8n' });
+            }
+
+            const data = await response.json();
+            
+            const isDataEmpty = !data || (data.notes && data.notes.length === 0) || (Array.isArray(data) && data.length === 0);
+            if (isDataEmpty) {
+                return res.status(500).json({ error: 'N8n returned empty notes data' });
+            }
+
+            // Save to MongoDB
+            await collection.updateOne(
+                { fetchDate: today },
+                { $set: { data: data, createdAt: new Date() } },
+                { upsert: true }
+            );
+            todayData = data;
+        }
         
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        const response = await fetch(N8N_CA_WEBHOOK_URL, { signal: controller.signal }).catch(() => null);
-        clearTimeout(timeoutId);
-
-        if (!response || !response.ok) {
-            return res.status(500).json({ error: 'Failed to fetch notes from n8n' });
+        console.log("Fetching up to 10 days of historical notes from MongoDB");
+        const historicalDocs = await collection.find({}).sort({ createdAt: -1 }).limit(10).toArray();
+        
+        let allNotes = [];
+        let allStaticNotes = [];
+        
+        for (const doc of historicalDocs) {
+            const data = doc.data;
+            if (data?.notes) allNotes.push(...data.notes);
+            else if (Array.isArray(data)) allNotes.push(...data); // flat array
+            if (data?.static_notes) allStaticNotes.push(...data.static_notes);
         }
 
-        const data = await response.json();
-        
-        const isDataEmpty = !data || (data.notes && data.notes.length === 0) || (Array.isArray(data) && data.length === 0);
-        if (isDataEmpty) {
-             return res.status(500).json({ error: 'N8n returned empty notes data' });
-        }
-
-        // 3. Save to MongoDB
-        await collection.updateOne(
-            { fetchDate: today },
-            { $set: { data: data, createdAt: new Date() } },
-            { upsert: true }
-        );
-        
-        console.log("Stored new daily notes to MongoDB successfully");
-        return res.status(200).json(data);
+        return res.status(200).json({ notes: allNotes, static_notes: allStaticNotes });
 
     } catch (e) {
         console.error(e);
