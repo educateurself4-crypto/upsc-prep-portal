@@ -679,7 +679,7 @@ button {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
 .quiz-library-card {
@@ -1513,10 +1513,11 @@ footer {
         text-align: center;
     }
 }
+
 /* Page Header Banner */
 .page-header-banner {
     background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8));
-    padding: 4rem 2rem 2rem;
+    padding: 3rem 2rem 2rem;
     margin-bottom: 0px;
     border-bottom: 1px solid var(--glass-border);
     display: flex;
@@ -1591,9 +1592,11 @@ footer {
     .page-header-banner {
         padding: 5rem 1.5rem 3rem;
     }
+
     .page-header-banner h1 {
         font-size: 2rem;
     }
+
     .page-header-banner p {
         font-size: 0.95rem;
     }

@@ -12,13 +12,19 @@ const Hero = () => {
         { name: 'Budget 2026', link: 'https://www.indiabudget.gov.in/doc/Budget_at_Glance/budget_at_a_glance.pdf' },
         { name: 'UPSC Exam Calendar 2026', link: 'https://upsc.gov.in/sites/default/files/Calendar-2026-Engl-150525_5.pdf' }
     ];
-    const quotes = [
-        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-        "Your only limit is your mind. Stay focused on the goal.",
-        "The secret of getting ahead is getting started.",
-        "IAS is not just a job, it's a responsibility. Prepare like a servant of the nation."
+    const ethicsQuotes = [
+        { text: "The best way to find yourself is to lose yourself in the service of others.", author: "Mahatma Gandhi" },
+        { text: "Educating the mind without educating the heart is no education at all.", author: "Aristotle" },
+        { text: "Integrity is doing the right thing, even when no one is watching.", author: "C.S. Lewis" },
+        { text: "In law a man is guilty when he violates the rights of others. In ethics he is guilty if he only thinks of doing so.", author: "Immanuel Kant" },
+        { text: "Relativity applies to physics, not ethics.", author: "Albert Einstein" },
+        { text: "Action without philosophy is a lethal weapon; philosophy without action is worthless.", author: "Soichiro Honda" },
+        { text: "Happiness is when what you think, what you say, and what you do are in harmony.", author: "Mahatma Gandhi" },
+        { text: "Earth provides enough to satisfy every man's needs, but not every man's greed.", author: "Mahatma Gandhi" },
+        { text: "The unexamined life is not worth living.", author: "Socrates" },
+        { text: "Non-violence is the greatest force at the disposal of mankind.", author: "Mahatma Gandhi" }
     ];
-    const dailyQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    const dailyQuote = ethicsQuotes[Math.floor(Math.random() * ethicsQuotes.length)];
 
     const shortcuts = [
         { id: '/syllabus', icon: <BookOpen size={20} />, label: 'Syllabus', color: 'var(--accent)' },
@@ -49,16 +55,16 @@ const Hero = () => {
                     transition={{ delay: 0.4 }}
                     onClick={() => navigate('/daily-quiz')}
                     whileHover={{ scale: 1.02, y: -2 }}
-                    style={{ 
-                        cursor: 'pointer', 
-                        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(251, 191, 36, 0.1))', 
-                        border: '1px solid var(--accent-color)', 
-                        width: '100%', 
-                        maxWidth: '600px', 
-                        marginBottom: '2rem', 
-                        padding: '1.2rem 1.5rem', 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
+                    style={{
+                        cursor: 'pointer',
+                        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(251, 191, 36, 0.1))',
+                        border: '1px solid var(--accent-color)',
+                        width: '100%',
+                        maxWidth: '600px',
+                        marginBottom: '2rem',
+                        padding: '1.2rem 1.5rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
                         color: 'inherit'
                     }}
@@ -78,11 +84,17 @@ const Hero = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '1rem', width: '100%', maxWidth: '600px', marginBottom: '2rem' }}
                 >
-                    <Quote size={14} className="accent-text" />
-                    <span>{dailyQuote}</span>
+                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent)', fontWeight: 'bold', alignSelf: 'flex-start' }}>GS Paper 4 - Ethics Question / Quote</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left' }}>
+                        <Quote size={20} className="accent-text" style={{ flexShrink: 0, marginTop: '2px' }} />
+                        <span style={{ fontSize: '1rem', fontStyle: 'italic', lineHeight: '1.4' }}>"{dailyQuote.text}"</span>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', alignSelf: 'flex-end', fontStyle: 'italic' }}>
+                        — {dailyQuote.author}
+                    </div>
                 </motion.div>
-
                 {/* Latest Notifications Section */}
                 <motion.div
                     className="notifications-banner glass-card"
