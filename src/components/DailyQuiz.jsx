@@ -22,6 +22,7 @@ const DailyQuiz = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
     const [showExplanation, setShowExplanation] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
 
     const normalizeQuestion = (item) => {
         const options = item.options || [
@@ -204,6 +205,7 @@ const DailyQuiz = () => {
     );
 
     const activeLibrary = (activeSubTab === 'ca' ? caQuizzes : staticQuizzes).filter(q => q.questions && q.questions.length > 0);
+    const visibleLibrary = isExpanded ? activeLibrary : activeLibrary.slice(0, 4);
 
     return (
         <div className="multi-page-view">
@@ -222,8 +224,8 @@ const DailyQuiz = () => {
             {!testStarted && (
                 <div className="mocktest-container" style={{ paddingBottom: '0' }}>
                     <div className="tabs" style={{ marginBottom: '2rem' }}>
-                        <button className={`tab-btn ${activeSubTab === 'ca' ? 'active' : ''}`} onClick={() => setActiveSubTab('ca')}>Current Affairs Quizzes</button>
-                        <button className={`tab-btn ${activeSubTab === 'static' ? 'active' : ''}`} onClick={() => setActiveSubTab('static')}>Static Quizzes</button>
+                        <button className={`tab-btn ${activeSubTab === 'ca' ? 'active' : ''}`} onClick={() => {setActiveSubTab('ca'); setIsExpanded(false);}}>Current Affairs Quizzes</button>
+                        <button className={`tab-btn ${activeSubTab === 'static' ? 'active' : ''}`} onClick={() => {setActiveSubTab('static'); setIsExpanded(false);}}>Static Quizzes</button>
                     </div>
                 </div>
             )}
@@ -231,23 +233,38 @@ const DailyQuiz = () => {
             {!testStarted ? (
                 <div className="quiz-library-grid">
                     {activeLibrary.length > 0 ? (
-                        activeLibrary.map((quiz, idx) => (
-                            <motion.div
-                                key={idx}
-                                className="quiz-library-card glass-card"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.1 }}
-                            >
-                                <div className="quiz-lib-meta">
-                                    <span className="badge">{quiz.category || (activeSubTab === 'ca' ? 'Daily CA' : 'Static')}</span>
-                                    {quiz.date && <span className="date">{quiz.date}</span>}
-                                </div>
-                                <h3>{quiz.title}</h3>
-                                <p>{quiz.questions.length} Questions</p>
-                                <button className="btn btn-primary" onClick={() => startQuiz(quiz)}>Practice Now</button>
-                            </motion.div>
-                        ))
+                        <>
+                            {visibleLibrary.map((quiz, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    className="quiz-library-card glass-card"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                >
+                                    <div className="quiz-lib-meta">
+                                        <span className="badge">{quiz.category || (activeSubTab === 'ca' ? 'Daily CA' : 'Static')}</span>
+                                        {quiz.date && <span className="date">{quiz.date}</span>}
+                                    </div>
+                                    <h3>{quiz.title}</h3>
+                                    <p>{quiz.questions.length} Questions</p>
+                                    <button className="btn btn-primary" onClick={() => startQuiz(quiz)}>Practice Now</button>
+                                </motion.div>
+                            ))}
+                            {!isExpanded && activeLibrary.length > 4 && (
+                                <motion.div
+                                    className="quiz-library-card glass-card"
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', minHeight: '150px' }}
+                                    onClick={() => setIsExpanded(true)}
+                                    whileHover={{ scale: 1.05 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                >
+                                    <h3 style={{ color: 'var(--accent-color)', margin: 0, textAlign: 'center' }}>+{activeLibrary.length - 4} More<br/><span style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>Click to expand</span></h3>
+                                </motion.div>
+                            )}
+                        </>
                     ) : (
                         <div className="empty-state glass-card" style={{ gridColumn: '1/-1' }}>
                             <p>No quizzes available in this section yet.</p>

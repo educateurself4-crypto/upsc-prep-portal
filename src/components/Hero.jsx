@@ -12,7 +12,7 @@ const Hero = () => {
         { name: 'Budget 2026', link: 'https://www.indiabudget.gov.in/doc/Budget_at_Glance/budget_at_a_glance.pdf' },
         { name: 'UPSC Exam Calendar 2026', link: 'https://upsc.gov.in/sites/default/files/Calendar-2026-Engl-150525_5.pdf' }
     ];
-    const ethicsQuotes = [
+    const Quotes = [
         { text: "The best way to find yourself is to lose yourself in the service of others.", author: "Mahatma Gandhi" },
         { text: "Educating the mind without educating the heart is no education at all.", author: "Aristotle" },
         { text: "Integrity is doing the right thing, even when no one is watching.", author: "C.S. Lewis" },
@@ -24,7 +24,7 @@ const Hero = () => {
         { text: "The unexamined life is not worth living.", author: "Socrates" },
         { text: "Non-violence is the greatest force at the disposal of mankind.", author: "Mahatma Gandhi" }
     ];
-    const dailyQuote = ethicsQuotes[Math.floor(Math.random() * ethicsQuotes.length)];
+    const dailyQuote = Quotes[Math.floor(Math.random() * Quotes.length)];
 
     const shortcuts = [
         { id: '/syllabus', icon: <BookOpen size={20} />, label: 'Syllabus', color: 'var(--accent)' },
@@ -61,8 +61,8 @@ const Hero = () => {
                         border: '1px solid var(--accent-color)',
                         width: '100%',
                         maxWidth: '600px',
-                        marginBottom: '2rem',
-                        padding: '1.2rem 1.5rem',
+                        marginBottom: '1rem',
+                        padding: '1rem 1.5rem',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
@@ -84,9 +84,9 @@ const Hero = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '1rem', width: '100%', maxWidth: '600px', marginBottom: '2rem' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '1rem', width: '100%', maxWidth: '600px', marginBottom: '1rem' }}
                 >
-                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent)', fontWeight: 'bold', alignSelf: 'flex-start' }}>GS Paper 4 - Ethics Question / Quote</div>
+                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent)', fontWeight: 'bold', alignSelf: 'flex-start' }}>Today's Quote</div>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left' }}>
                         <Quote size={20} className="accent-text" style={{ flexShrink: 0, marginTop: '2px' }} />
                         <span style={{ fontSize: '1rem', fontStyle: 'italic', lineHeight: '1.4' }}>"{dailyQuote.text}"</span>
