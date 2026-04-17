@@ -31,20 +31,34 @@ export default async function handler(req, res) {
         const db = mongoClient.db('upsc-portal');
         const collection = db.collection('daily-notes');
 
-        const today = new Date().toDateString();
+        // The n8n workflow updates content at 10 PM IST (16:30 UTC) every day.
+        // We want the logical "Day" (fetchDate) to rollover exactly at that time, rather than midnight UTC.
+        // Subtracting 16.5 hours from current UTC time ensures the date string changes at exactly 16:30 UTC.
+        const getEffectiveDate = () => {
+            const now = new Date();
+            const offsetMs = 16.5 * 60 * 60 * 1000; 
+            return new Date(now.getTime() - offsetMs).toDateString();
+        };
+        const today = getEffectiveDate();
 
         let todayData = null;
 
         // 1. Check if we already have today's notes in DB
+        const CACHE_TTL = 30 * 60 * 1000; // 30 minutes cache
         const existingData = await collection.findOne({ fetchDate: today });
         const hasNotes = existingData && existingData.data && ((existingData.data.notes && existingData.data.notes.length > 0) || (Array.isArray(existingData.data) && existingData.data.length > 0));
         
         if (hasNotes) {
-            console.log("Found today's notes in MongoDB Cache");
-            todayData = existingData.data;
+            const age = existingData.createdAt ? (new Date() - new Date(existingData.createdAt)) : 0;
+            if (existingData.createdAt && age < CACHE_TTL) {
+                console.log("Found today's notes in MongoDB Cache (Valid)");
+                todayData = existingData.data;
+            } else {
+                console.log(`Cache expired (${Math.round(age/1000/60)} mins old). Fetching fresh from n8n...`);
+            }
         }
 
-        // 2. Not found in DB, fetch from n8n webhook
+        // 2. Not found in DB or expired, fetch from n8n webhook
         if (!todayData) {
             console.log("No valid notes cache for today, fetching fresh from n8n...");
             const N8N_NOTES_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
@@ -57,23 +71,33 @@ export default async function handler(req, res) {
             clearTimeout(timeoutId);
 
             if (!response || !response.ok) {
-                return res.status(response?.status || 500).json({ error: 'Failed to fetch notes from n8n' });
+                if (hasNotes) {
+                    console.log("n8n failed. Falling back to stale cache.");
+                    todayData = existingData.data;
+                } else {
+                    return res.status(response?.status || 500).json({ error: 'Failed to fetch notes from n8n' });
+                }
+            } else {
+                const data = await response.json();
+                
+                const isDataEmpty = !data || (data.notes && data.notes.length === 0) || (Array.isArray(data) && data.length === 0);
+                if (isDataEmpty) {
+                    if (hasNotes) {
+                        console.log("n8n returned empty. Falling back to stale cache.");
+                        todayData = existingData.data;
+                    } else {
+                        return res.status(500).json({ error: 'N8n returned empty notes data' });
+                    }
+                } else {
+                    // Save to MongoDB
+                    await collection.updateOne(
+                        { fetchDate: today },
+                        { $set: { data: data, createdAt: new Date() } },
+                        { upsert: true }
+                    );
+                    todayData = data;
+                }
             }
-
-            const data = await response.json();
-            
-            const isDataEmpty = !data || (data.notes && data.notes.length === 0) || (Array.isArray(data) && data.length === 0);
-            if (isDataEmpty) {
-                return res.status(500).json({ error: 'N8n returned empty notes data' });
-            }
-
-            // Save to MongoDB
-            await collection.updateOne(
-                { fetchDate: today },
-                { $set: { data: data, createdAt: new Date() } },
-                { upsert: true }
-            );
-            todayData = data;
         }
         
         console.log("Fetching up to 10 days of historical notes from MongoDB");
