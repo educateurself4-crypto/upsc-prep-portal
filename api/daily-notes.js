@@ -61,7 +61,7 @@ export default async function handler(req, res) {
         // 2. Not found in DB or expired, fetch from n8n webhook
         if (!todayData) {
             console.log("No valid notes cache for today, fetching fresh from n8n...");
-            const N8N_NOTES_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
+            const N8N_NOTES_WEBHOOK_URL = 'https://palegoldenrod-elk-207353.hostingersite.com/webhook/get-upsc-content';
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 8000);
 

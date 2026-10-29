@@ -18,15 +18,17 @@ const VisitorCounter = () => {
                 if (!hasCounted) {
                     // 2. If new session, increment the global counter
                     const response = await fetch(`${API_URL}?action=up`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     data = await response.json();
                     sessionStorage.setItem('hasCounted', 'true');
                 } else {
                     // 3. Otherwise, just fetch the current total
                     const response = await fetch(API_URL);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     data = await response.json();
                 }
 
-                if (data && data.count) {
+                if (data && typeof data.count === 'number') {
                     // We add a base of 12,000 to reflect the existing community
                     setCount(12000 + data.count);
                 }

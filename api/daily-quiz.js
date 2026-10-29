@@ -39,8 +39,8 @@ export default async function handler(req, res) {
             return new Date(now.getTime() - offsetMs).toDateString();
         };
         const today = getEffectiveDate();
-        const N8N_MOCK_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-upsc-content';
-        const N8N_STATIC_QUIZ_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/get-static-quiz';
+        const N8N_MOCK_WEBHOOK_URL = 'https://palegoldenrod-elk-207353.hostingersite.com/webhook/get-upsc-content';
+        const N8N_STATIC_QUIZ_WEBHOOK_URL = 'https://palegoldenrod-elk-207353.hostingersite.com/webhook/get-static-quiz';
 
         let todayData = null;
 

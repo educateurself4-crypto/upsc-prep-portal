@@ -12,7 +12,7 @@ const AIChat = () => {
     const [input, setInput] = useState('')
     const [isTyping, setIsTyping] = useState(false)
 
-    const AI_WEBHOOK_URL = 'https://n8n.srv1012222.hstgr.cloud/webhook/84fa40cd-7850-40e4-bc05-c2115581c315';
+    const AI_WEBHOOK_URL = 'https://palegoldenrod-elk-207353.hostingersite.com/webhook/84fa40cd-7850-40e4-bc05-c2115581c315';
 
     const handleSend = async () => {
         const messageText = input.trim();

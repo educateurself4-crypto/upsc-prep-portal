@@ -4,11 +4,20 @@ const uri = process.env.MONGODB_URI;
 let client;
 let clientPromise;
 
-if (!global._mongoClientPromise) {
-    client = new MongoClient(uri);
-    global._mongoClientPromise = client.connect();
+if (!uri) {
+    console.error('Please add your Mongo URI to environment variables');
+} else {
+    if (process.env.NODE_ENV === 'development') {
+        if (!global._mongoClientPromise) {
+            client = new MongoClient(uri);
+            global._mongoClientPromise = client.connect();
+        }
+        clientPromise = global._mongoClientPromise;
+    } else {
+        client = new MongoClient(uri);
+        clientPromise = client.connect();
+    }
 }
-clientPromise = global._mongoClientPromise;
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -19,6 +28,10 @@ export default async function handler(req, res) {
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+
+    if (!uri) {
+        return res.status(200).json({ count: 450, warning: 'MONGODB_URI is not set in environment' });
     }
 
     try {
